@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables (Design Tokens) */
+:root {
+  /* Primary Colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* Neutral Colors */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* Layout */
+  --sidebar-width: 16rem;
+  --sidebar-collapsed-width: 4.5rem;
+  --header-height: 4rem;
+}
+
+/* Base Layer */
+@layer base {
+  html {
+    @apply scroll-smooth;
+    /* 최소 해상도: Z폴더 커버화면 기준 320px */
+    min-width: 320px;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+    min-width: 320px;
+    /* 한글 단어 단위 줄바꿈 (글자 단위 줄바꿈 방지) */
+    word-break: keep-all;
+  }
+
+  /* Focus visible 스타일 */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-500;
+  }
+
+  /* 스크롤바 기본 숨김 */
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Components Layer */
+@layer components {
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-toast
+           focus:bg-primary-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg;
+  }
+}
+
+/* Utilities Layer */
+@layer utilities {
+  /* Safe area for mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
