@@ -73,12 +73,24 @@ export default defineEventHandler(async (event) => {
       setResponseHeader(event, 'Content-Type', resContentType)
     }
 
-    // JSON 응답 반환
-    if (resContentType?.includes('application/json')) {
-      return await response.json()
+    // 응답 body 처리
+    const responseText = await response.text()
+
+    // 빈 응답이면 빈 객체 반환
+    if (!responseText) {
+      return { success: true }
     }
 
-    return await response.text()
+    // JSON 응답 파싱
+    if (resContentType?.includes('application/json')) {
+      try {
+        return JSON.parse(responseText)
+      } catch {
+        return { success: true, data: responseText }
+      }
+    }
+
+    return responseText
   } catch (error) {
     console.error('[Proxy Error]', error.message)
     setResponseStatus(event, 500)

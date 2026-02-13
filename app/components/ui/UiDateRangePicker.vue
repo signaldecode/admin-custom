@@ -58,6 +58,14 @@ const props = defineProps({
 
 const emit = defineEmits(['update:start', 'update:end', 'validation-change'])
 
+// datetime 값을 YYYY-MM-DDTHH:mm:00 형식으로 정규화 (나노초 제거)
+const normalizeDateTime = (value, defaultTime = '00:00') => {
+  if (!value) return ''
+  const datePart = value.slice(0, 10)
+  const timePart = value.slice(11, 16) || defaultTime
+  return `${datePart}T${timePart}:00`
+}
+
 // 종료일 없음 체크 상태
 const hasNoEndDate = ref(false)
 
@@ -74,23 +82,8 @@ const handleStartChange = (e) => {
     return
   }
 
-  // 날짜만 변경된 경우 (시간 부분이 없거나 기본값인 경우) 00:00:00으로 설정
-  const currentStart = props.start
-  const newDatePart = value.slice(0, 10)
-  const currentDatePart = currentStart ? currentStart.slice(0, 10) : ''
-
-  let newValue = value
-  // 날짜가 변경되었고, 시간이 설정되지 않았거나 새로 날짜를 선택한 경우
-  if (newDatePart !== currentDatePart) {
-    // 기존에 시간이 있었다면 유지, 없었다면 00:00:00으로 설정
-    if (!currentStart || currentStart.length < 16) {
-      newValue = `${newDatePart}T00:00:00`
-    } else {
-      // 기존 시간 유지
-      const timePart = currentStart.slice(11) || '00:00:00'
-      newValue = `${newDatePart}T${timePart}`
-    }
-  }
+  // YYYY-MM-DDTHH:mm:00 형식으로 정규화 (기본 시간: 00:00)
+  const newValue = normalizeDateTime(value, '00:00')
 
   emit('update:start', newValue)
   validateDates(newValue, props.end)
@@ -105,23 +98,8 @@ const handleEndChange = (e) => {
     return
   }
 
-  // 날짜만 변경된 경우 23:59:59로 설정
-  const currentEnd = props.end
-  const newDatePart = value.slice(0, 10)
-  const currentDatePart = currentEnd ? currentEnd.slice(0, 10) : ''
-
-  let newValue = value
-  // 날짜가 변경되었고, 시간이 설정되지 않았거나 새로 날짜를 선택한 경우
-  if (newDatePart !== currentDatePart) {
-    // 기존에 시간이 있었다면 유지, 없었다면 23:59:59로 설정
-    if (!currentEnd || currentEnd.length < 16) {
-      newValue = `${newDatePart}T23:59:59`
-    } else {
-      // 기존 시간 유지
-      const timePart = currentEnd.slice(11) || '23:59:59'
-      newValue = `${newDatePart}T${timePart}`
-    }
-  }
+  // YYYY-MM-DDTHH:mm:00 형식으로 정규화 (기본 시간: 23:59)
+  const newValue = normalizeDateTime(value, '23:59')
 
   emit('update:end', newValue)
   validateDates(props.start, newValue)

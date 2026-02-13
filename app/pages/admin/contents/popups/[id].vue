@@ -391,21 +391,22 @@ onMounted(() => {
 
           <!-- 링크 오픈 방식 -->
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">링크 오픈 방식</label>
+            <p class="block text-sm font-medium text-neutral-700 mb-2">링크 오픈 방식</p>
             <div class="flex flex-wrap gap-2">
-              <label
+              <button
                 v-for="opt in linkTargetOptions"
                 :key="opt.value"
+                type="button"
                 :class="[
                   'px-4 py-2 border rounded-lg cursor-pointer transition-colors',
                   form.linkTarget === opt.value
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
                 ]"
+                @click="form.linkTarget = opt.value"
               >
-                <input v-model="form.linkTarget" type="radio" :value="opt.value" class="sr-only">
                 <span class="text-sm font-medium">{{ opt.label }}</span>
-              </label>
+              </button>
             </div>
           </div>
         </div>
@@ -416,46 +417,48 @@ onMounted(() => {
         <div class="space-y-4">
           <!-- 닫기 옵션 -->
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">닫기 옵션</label>
+            <p class="block text-sm font-medium text-neutral-700 mb-2">닫기 옵션</p>
             <div class="flex flex-wrap gap-2">
-              <label
+              <button
                 v-for="opt in closeOptions"
                 :key="opt.value"
+                type="button"
                 :class="[
                   'px-4 py-2 border rounded-lg cursor-pointer transition-colors',
                   form.closeOption === opt.value
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
                 ]"
+                @click="form.closeOption = opt.value"
               >
-                <input v-model="form.closeOption" type="radio" :value="opt.value" class="sr-only">
                 <span class="text-sm font-medium">{{ opt.label }}</span>
-              </label>
+              </button>
             </div>
           </div>
 
           <!-- 팝업 형태 -->
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">팝업 형태</label>
+            <p class="block text-sm font-medium text-neutral-700 mb-2">팝업 형태</p>
             <div class="flex flex-wrap gap-3">
-              <label
+              <button
                 v-for="opt in popupTypeOptions"
                 :key="opt.value"
+                type="button"
                 :class="[
-                  'flex-1 min-w-[140px] px-4 py-3 border rounded-lg cursor-pointer transition-colors',
+                  'flex-1 min-w-[140px] px-4 py-3 border rounded-lg cursor-pointer transition-colors text-left',
                   form.popupType === opt.value
                     ? 'border-primary-500 bg-primary-50'
                     : 'border-neutral-200 hover:border-neutral-300'
                 ]"
+                @click="form.popupType = opt.value"
               >
-                <input v-model="form.popupType" type="radio" :value="opt.value" class="sr-only">
                 <p class="text-sm font-medium" :class="form.popupType === opt.value ? 'text-primary-700' : 'text-neutral-900'">
                   {{ opt.label }}
                 </p>
                 <p class="text-xs mt-0.5" :class="form.popupType === opt.value ? 'text-primary-600' : 'text-neutral-500'">
                   {{ opt.description }}
                 </p>
-              </label>
+              </button>
             </div>
           </div>
         </div>

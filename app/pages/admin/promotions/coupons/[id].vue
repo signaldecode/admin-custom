@@ -148,9 +148,9 @@ const buildPayload = () => {
   if (form.value.validityType === 'DAYS_FROM_DOWNLOAD') {
     payload.validityDays = Number(form.value.validityDays) || 0
   } else {
-    // "2026-02-27T01:01:00" 형식 (Z 없이 로컬 시간)
-    payload.validFrom = form.value.validFrom ? form.value.validFrom.slice(0, 19).padEnd(19, ':00') : null
-    payload.validTo = form.value.validTo ? form.value.validTo.slice(0, 19).padEnd(19, ':00') : null
+    // "2026-02-27T01:01:00" 형식 (Z 없이 로컬 시간, 초는 00 고정)
+    payload.validFrom = form.value.validFrom ? form.value.validFrom.slice(0, 16) + ':00' : null
+    payload.validTo = form.value.validTo ? form.value.validTo.slice(0, 16) + ':00' : null
   }
 
   return payload
@@ -389,15 +389,15 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- 미사용 쿠폰 회수 (발급중지 상태에서만 표시) -->
-        <div v-if="isStopped" class="mt-4 flex justify-end">
+        <!-- 미사용 쿠폰 회수 (발급중지 상태에서만 표시) todo: 우선 비활성화 추후 소비자와 싱크 필요 -->
+        <!-- <div v-if="isStopped" class="mt-4 flex justify-end">
           <button
             class="px-4 py-2 text-sm font-medium text-white bg-neutral-600 hover:bg-neutral-700 rounded-lg transition-colors"
             @click="openRecallModal"
           >
             미사용 쿠폰 회수
           </button>
-        </div>
+        </div> -->
       </UiCard>
 
       <!-- 기본 정보 -->
@@ -594,8 +594,8 @@ onMounted(async () => {
             <p class="text-xs text-neutral-400 mt-1">불가 선택 시, 프로모션 할인 상품에서는 해당 쿠폰이 비활성화됩니다.</p>
           </div>
 
-          <!-- 중복 사용 여부 -->
-          <div>
+          <!-- 중복 사용 여부 todo: 우선 비활성화 추후 소비자와 싱크 필요 -->
+          <!-- <div>
             <p class="block text-sm font-medium text-neutral-700 mb-2">동일 쿠폰 중복 사용</p>
             <div class="flex gap-3">
               <button
@@ -628,7 +628,7 @@ onMounted(async () => {
               </button>
             </div>
             <p class="text-xs text-neutral-400 mt-1">가능 선택 시, 한 회원이 동일 쿠폰을 여러 번 다운로드하여 사용할 수 있습니다.</p>
-          </div>
+          </div> -->
         </div>
       </UiCard>
 

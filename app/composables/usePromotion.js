@@ -81,10 +81,12 @@ export function usePromotion() {
 
   /**
    * 날짜 포맷 변환 (datetime-local -> ISO)
+   * YYYY-MM-DDTHH:mm:00 형식으로 반환
    */
   const formatDateForApi = (dateString) => {
     if (!dateString) return null
-    return `${dateString}:00`
+    // YYYY-MM-DDTHH:mm 까지만 잘라서 :00 추가
+    return dateString.slice(0, 16) + ':00'
   }
 
   return {
