@@ -3,7 +3,7 @@
  * 서버 사이드에서 요청하므로 CORS 문제 없음
  */
 export default defineEventHandler(async (event) => {
-  const targetBase = 'https://shopping-mall-admin-backend-api-production.up.railway.app/api/v1'
+  const targetBase = process.env.API_BASE_URL || 'https://admin-api.clprlto.com/api/v1'
 
   // 요청 경로 추출 (/api 이후 부분)
   const path = event.path.replace(/^\/api/, '') || ''
