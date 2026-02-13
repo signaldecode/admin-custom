@@ -70,6 +70,7 @@ const settlement = ref({
   bankName: '',
   bankAccount: '',
   bankHolder: '',
+  paymentDeadlineDays: 3,
 })
 
 // 운영 상태 (점검 모드)
@@ -779,6 +780,27 @@ onMounted(() => {
                 placeholder="예금주명"
               >
             </div>
+          </div>
+        </UiCard>
+
+        <UiCard>
+          <template #header>
+            <h3 class="font-semibold text-neutral-900">입금 기한 설정</h3>
+            <p class="text-sm text-neutral-500 mt-1">주문 후 입금까지의 기한을 설정합니다.</p>
+          </template>
+          <div class="max-w-xs">
+            <label class="block text-sm font-medium text-neutral-700 mb-1">
+              입금 기한 (일)
+            </label>
+            <input
+              v-model.number="settlement.paymentDeadlineDays"
+              type="number"
+              min="1"
+              max="30"
+              class="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="3"
+            >
+            <p class="text-xs text-neutral-500 mt-1">최소 1일 ~ 최대 30일 (기본값: 3일)</p>
           </div>
         </UiCard>
       </template>
