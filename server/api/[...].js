@@ -4,22 +4,26 @@
  */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const targetBase = config.apiBaseUrl
+  const targetBase = config.public.apiBaseUrl
 
-  // 요청 경로 추출 (/api 이후 부분)
-  const path = event.path.replace(/^\/api/, '') || ''
+  // 요청 경로에서 /api 제거하고 쿼리스트링 분리
+  const fullPath = event.path.replace(/^\/api/, '') || ''
+  const questionIndex = fullPath.indexOf('?')
+  const path = questionIndex > -1 ? fullPath.substring(0, questionIndex) : fullPath
+  const queryString = questionIndex > -1 ? fullPath.substring(questionIndex + 1) : ''
 
-  // 쿼리스트링 포함
-  const query = getQuery(event)
-  const queryString = new URLSearchParams(query).toString()
+  // 최종 URL 조합
   const targetUrl = queryString ? `${targetBase}${path}?${queryString}` : `${targetBase}${path}`
 
-  // 요청 메서드
   const method = event.method
 
   // 요청 헤더
-  const headers = {
-    'Content-Type': 'application/json',
+  const headers = {}
+
+  // Content-Type 전달
+  const contentType = getHeader(event, 'content-type')
+  if (contentType) {
+    headers['Content-Type'] = contentType
   }
 
   // 쿠키 전달
@@ -36,36 +40,48 @@ export default defineEventHandler(async (event) => {
 
   // POST, PUT, PATCH, DELETE인 경우 body 전달
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-    const body = await readBody(event)
-    if (body) {
-      fetchOptions.body = JSON.stringify(body)
+    // FormData인 경우 스트림으로 전달
+    if (contentType?.includes('multipart/form-data')) {
+      fetchOptions.body = event.node.req
+      fetchOptions.duplex = 'half'
+    } else {
+      const body = await readBody(event)
+      if (body) {
+        fetchOptions.body = JSON.stringify(body)
+        headers['Content-Type'] = 'application/json'
+      }
     }
   }
 
   console.log('[Proxy]', method, targetUrl)
 
-  const response = await fetch(targetUrl, fetchOptions)
+  try {
+    const response = await fetch(targetUrl, fetchOptions)
 
-  // 응답 헤더에서 Set-Cookie 추출하여 클라이언트에 전달
-  const setCookieHeader = response.headers.getSetCookie?.() || response.headers.get('set-cookie')
-  if (setCookieHeader) {
-    if (Array.isArray(setCookieHeader)) {
-      setCookieHeader.forEach(cookie => {
-        appendResponseHeader(event, 'Set-Cookie', cookie)
-      })
-    } else {
-      appendResponseHeader(event, 'Set-Cookie', setCookieHeader)
+    // Set-Cookie 전달
+    const setCookies = response.headers.getSetCookie?.() || []
+    setCookies.forEach((cookie) => {
+      appendResponseHeader(event, 'Set-Cookie', cookie)
+    })
+
+    // 응답 상태 코드 설정
+    setResponseStatus(event, response.status)
+
+    // 응답 Content-Type 전달
+    const resContentType = response.headers.get('content-type')
+    if (resContentType) {
+      setResponseHeader(event, 'Content-Type', resContentType)
     }
+
+    // JSON 응답 반환
+    if (resContentType?.includes('application/json')) {
+      return await response.json()
+    }
+
+    return await response.text()
+  } catch (error) {
+    console.error('[Proxy Error]', error.message)
+    setResponseStatus(event, 500)
+    return { error: error.message }
   }
-
-  // 응답 상태 코드 설정
-  setResponseStatus(event, response.status)
-
-  // JSON 응답 반환
-  const contentType = response.headers.get('content-type')
-  if (contentType && contentType.includes('application/json')) {
-    return await response.json()
-  }
-
-  return await response.text()
 })

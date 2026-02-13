@@ -41,12 +41,11 @@ export default defineNuxtConfig({
 
   // 런타임 설정 (환경변수 기반)
   runtimeConfig: {
-    // 서버 전용 (SSR에서 사용) - 환경변수 필수
-    apiBaseUrl: process.env.API_BASE_URL,
     public: {
-      // API 요청 경로 (프록시 사용: /api, 직접 호출: 외부 URL)
-      // Safari 쿠키 문제 해결을 위해 /api 프록시 권장
+      // API 요청 경로 (프록시 사용)
       apiBase: '/api',
+      // 백엔드 API URL (서버에서 프록시용)
+      apiBaseUrl: process.env.API_BASE_URL,
       // Phase 1: 단일 서비스 식별자 (Phase 2에서 동적으로 변경 가능)
       defaultTenantId: process.env.NUXT_PUBLIC_DEFAULT_TENANT_ID || 'default',
     },

@@ -113,16 +113,19 @@ export function useApi() {
    * GET 요청
    */
   const get = (endpoint, params = {}) => {
-    const searchParams = new URLSearchParams()
+    // endpoint에서 기존 쿼리스트링 분리
+    const [basePath, existingQuery] = endpoint.split('?')
+
+    const searchParams = new URLSearchParams(existingQuery || '')
 
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        searchParams.append(key, value)
+        searchParams.set(key, String(value)) // append 대신 set 사용
       }
     })
 
     const queryString = searchParams.toString()
-    const url = queryString ? `${endpoint}?${queryString}` : endpoint
+    const url = queryString ? `${basePath}?${queryString}` : basePath
 
     return request(url, { method: 'GET' })
   }

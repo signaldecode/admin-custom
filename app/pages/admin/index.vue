@@ -15,8 +15,9 @@ const error = ref(null)
 
 // 주문 현황 데이터
 const orderStats = ref([
+  { id: 'pending', label: '입금확인', value: 0, color: 'warning', to: '/admin/orders?status=PENDING' },
   { id: 'new', label: '신규주문', value: 0, color: 'primary', to: '/admin/orders?status=PAID' },
-  { id: 'ready', label: '배송준비', value: 0, color: 'warning', to: '/admin/orders?status=PREPARING' },
+  { id: 'ready', label: '배송준비', value: 0, color: 'info', to: '/admin/orders?status=PREPARING' },
   { id: 'shipping', label: '배송중', value: 0, color: 'info', to: '/admin/orders?status=SHIPPING' },
   { id: 'delivered', label: '배송완료', value: 0, color: 'success', to: '/admin/orders?status=DELIVERED' },
 ])
@@ -70,10 +71,11 @@ const fetchDashboard = async () => {
 
     // 주문 현황 매핑
     if (data.orderStatus) {
-      orderStats.value[0].value = data.orderStatus.newOrders || 0
-      orderStats.value[1].value = data.orderStatus.preparing || 0
-      orderStats.value[2].value = data.orderStatus.shipping || 0
-      orderStats.value[3].value = data.orderStatus.completed || 0
+      orderStats.value[0].value = data.orderStatus.pending || 0
+      orderStats.value[1].value = data.orderStatus.newOrders || 0
+      orderStats.value[2].value = data.orderStatus.preparing || 0
+      orderStats.value[3].value = data.orderStatus.shipping || 0
+      orderStats.value[4].value = data.orderStatus.completed || 0
     }
 
     // 매출 현황 매핑
@@ -192,7 +194,7 @@ onMounted(() => {
             주문목록 →
           </NuxtLink>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <NuxtLink
             v-for="stat in orderStats"
             :key="stat.id"
