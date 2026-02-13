@@ -1,23 +1,4 @@
 <script setup>
-/**
- * 팝업 등록/수정 페이지
- * - /admin/contents/popups/new → 등록 모드
- * - /admin/contents/popups/:id → 수정 모드
- *
- * API Request JSON (application/json):
- * {
- *   "name": "팝업명",
- *   "status": "ACTIVE",  // ACTIVE | INACTIVE
- *   "image": "https://example.com/popup.jpg",
- *   "linkUrl": "https://example.com/event",
- *   "linkTarget": "_self",
- *   "closeOption": "TODAY",
- *   "popupType": "CENTER",
- *   "startedAt": "2024-01-01T00:00:00",
- *   "endedAt": "2024-12-31T23:59:59"
- * }
- */
-
 import { useUiStore } from '~/stores/ui'
 import { useApi } from '~/composables/useApi'
 
@@ -27,30 +8,25 @@ const uiStore = useUiStore()
 const { get, post, patch, del } = useApi()
 const { $api } = useNuxtApp()
 
-// 모드 판별
 const isEditMode = computed(() => route.params.id !== 'new')
 const popupId = computed(() => route.params.id)
 
-// 링크 타겟 옵션 (API 스펙에 맞춤)
 const linkTargetOptions = [
   { value: '_blank', label: '새창에서 열기' },
   { value: '_self', label: '현재창에서 이동' },
 ]
 
-// 닫기 옵션 (API 스펙에 맞춤)
 const closeOptions = [
   { value: 'CLOSE', label: '닫기' },
   { value: 'TODAY', label: '오늘 하루 보지 않기' },
   { value: 'WEEK', label: '일주일 보지 않기' },
 ]
 
-// 팝업 형태 옵션 (API 스펙에 맞춤)
 const popupTypeOptions = [
   { value: 'CENTER', label: '중앙 팝업', description: '화면 중앙에 표시' },
   { value: 'FLOATING', label: '플로팅 팝업', description: '화면 모서리에 표시' },
 ]
 
-// 오늘 날짜+시간 기본값 (YYYY-MM-DDTHH:mm 형식)
 const getDefaultDateTime = () => {
   const now = new Date()
   const year = now.getFullYear()
@@ -61,11 +37,10 @@ const getDefaultDateTime = () => {
   return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
-// 폼 데이터 (API 스펙에 맞춤)
 const form = ref({
   name: '',
-  status: 'INACTIVE', // ACTIVE | INACTIVE
-  image: '', // 이미지 URL
+  status: 'INACTIVE',
+  image: '',
   linkUrl: '',
   linkTarget: '_blank',
   closeOption: 'TODAY',
@@ -75,7 +50,6 @@ const form = ref({
   endedAt: '',
 })
 
-// 활성화 상태 (스위치용 computed)
 const isActive = computed({
   get: () => form.value.status === 'ACTIVE',
   set: (val) => { form.value.status = val ? 'ACTIVE' : 'INACTIVE' }
@@ -86,21 +60,16 @@ const isSaving = ref(false)
 const isUploading = ref(false)
 const fileInputRef = ref(null)
 
-// 날짜 포맷 변환 (ISO -> datetime-local 형식)
 const formatDateForInput = (isoString) => {
   if (!isoString) return ''
-  // "2026-01-28T03:17:02.008Z" → "2026-01-28T03:17"
   return isoString.slice(0, 16)
 }
 
-// 날짜 포맷 변환 (datetime-local -> ISO)
 const formatDateForApi = (dateString) => {
   if (!dateString) return null
-  // "2026-01-28T03:17" → "2026-01-28T03:17:00"
-  return `${dateString}:00`
+  return dateString.slice(0, 16) + ':00'
 }
 
-// 팝업 상세 조회
 const fetchPopup = async () => {
   isLoading.value = true
 
@@ -131,12 +100,10 @@ const fetchPopup = async () => {
   }
 }
 
-// 이미지 파일 선택 및 업로드
 const handleFileSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
 
-  // 파일 유효성 검사
   if (!file.type.startsWith('image/')) {
     uiStore.showToast({ type: 'error', message: '이미지 파일만 업로드 가능합니다.' })
     return
@@ -149,13 +116,11 @@ const handleFileSelect = async (event) => {
   isUploading.value = true
 
   try {
-    // 이미지 업로드 API 호출
     const formData = new FormData()
     formData.append('file', file)
 
     const response = await $api.postFormData('/admin/images', formData)
 
-    // 업로드된 이미지 URL 설정
     form.value.image = response.data?.imageUrl || response.data?.url || response.imageUrl || response.url
 
     uiStore.showToast({ type: 'success', message: '이미지가 업로드되었습니다.' })
@@ -166,7 +131,6 @@ const handleFileSelect = async (event) => {
     })
   } finally {
     isUploading.value = false
-    // input 초기화 (같은 파일 재선택 가능하도록)
     if (fileInputRef.value) {
       fileInputRef.value.value = ''
     }
@@ -182,9 +146,7 @@ const removeImage = () => {
   }
 }
 
-// 저장
 const handleSave = async () => {
-  // 유효성 검사
   if (!form.value.name) {
     uiStore.showToast({ type: 'error', message: '팝업명을 입력해주세요.' })
     return
@@ -198,7 +160,6 @@ const handleSave = async () => {
   isSaving.value = true
 
   try {
-    // JSON 데이터
     const requestData = {
       name: form.value.name,
       status: form.value.status,
@@ -230,7 +191,6 @@ const handleSave = async () => {
   }
 }
 
-// 삭제
 const handleDelete = async () => {
   if (!confirm('이 팝업을 삭제하시겠습니까?')) return
 
@@ -271,10 +231,8 @@ onMounted(() => {
     </div>
 
     <div v-else class="space-y-6">
-      <!-- 기본 정보 -->
       <UiCard title="기본 정보">
         <div class="space-y-4">
-          <!-- 팝업명 -->
           <div>
             <label class="block text-sm font-medium text-neutral-700 mb-1">
               팝업명 <span class="text-error-500">*</span>
@@ -287,7 +245,6 @@ onMounted(() => {
             >
           </div>
 
-          <!-- 정렬 순서 -->
           <div>
             <label class="block text-sm font-medium text-neutral-700 mb-1">정렬 순서</label>
             <input
@@ -300,7 +257,6 @@ onMounted(() => {
             <p class="text-xs text-neutral-500 mt-1">숫자가 낮을수록 먼저 표시됩니다.</p>
           </div>
 
-          <!-- 활성화 상태 -->
           <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
             <div>
               <p class="font-medium text-neutral-900 text-sm">활성화 상태</p>
@@ -314,7 +270,6 @@ onMounted(() => {
         </div>
       </UiCard>
 
-      <!-- 이미지 -->
       <UiCard title="이미지">
         <div>
           <input
@@ -325,7 +280,6 @@ onMounted(() => {
             @change="handleFileSelect"
           >
 
-          <!-- 이미지 있음 -->
           <div
             v-if="form.image"
             class="relative"
@@ -347,7 +301,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 업로딩 중 -->
           <div
             v-else-if="isUploading"
             class="w-full h-48 bg-neutral-50 rounded-lg border-2 border-dashed border-neutral-300 flex items-center justify-center"
@@ -358,7 +311,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 이미지 없음 -->
           <div
             v-else
             class="w-full h-48 bg-neutral-50 rounded-lg border-2 border-dashed border-neutral-300 hover:border-primary-400 cursor-pointer transition-colors flex items-center justify-center"
@@ -375,10 +327,8 @@ onMounted(() => {
         </div>
       </UiCard>
 
-      <!-- 링크 설정 -->
       <UiCard title="링크 설정">
         <div class="space-y-4">
-          <!-- 링크 URL -->
           <div>
             <label class="block text-sm font-medium text-neutral-700 mb-1">링크 URL</label>
             <input
@@ -389,7 +339,6 @@ onMounted(() => {
             >
           </div>
 
-          <!-- 링크 오픈 방식 -->
           <div>
             <p class="block text-sm font-medium text-neutral-700 mb-2">링크 오픈 방식</p>
             <div class="flex flex-wrap gap-2">
@@ -412,10 +361,8 @@ onMounted(() => {
         </div>
       </UiCard>
 
-      <!-- 팝업 설정 -->
       <UiCard title="팝업 설정">
         <div class="space-y-4">
-          <!-- 닫기 옵션 -->
           <div>
             <p class="block text-sm font-medium text-neutral-700 mb-2">닫기 옵션</p>
             <div class="flex flex-wrap gap-2">
@@ -436,7 +383,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- 팝업 형태 -->
           <div>
             <p class="block text-sm font-medium text-neutral-700 mb-2">팝업 형태</p>
             <div class="flex flex-wrap gap-3">
@@ -464,7 +410,6 @@ onMounted(() => {
         </div>
       </UiCard>
 
-      <!-- 노출 기간 -->
       <UiCard title="노출 기간">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>

@@ -15,7 +15,7 @@ const error = ref(null)
 
 // 주문 현황 데이터
 const orderStats = ref([
-  { id: 'pending', label: '입금확인', value: 0, color: 'warning', to: '/admin/orders?status=PENDING' },
+  { id: 'pending', label: '결제대기', value: 0, color: 'warning', to: '/admin/orders?status=PENDING' },
   { id: 'new', label: '신규주문', value: 0, color: 'primary', to: '/admin/orders?status=PAID' },
   { id: 'ready', label: '배송준비', value: 0, color: 'info', to: '/admin/orders?status=PREPARING' },
   { id: 'shipping', label: '배송중', value: 0, color: 'info', to: '/admin/orders?status=SHIPPING' },

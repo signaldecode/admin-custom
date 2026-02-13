@@ -20,11 +20,16 @@ const bannerId = computed(() => route.params.id)
 
 // 배너 위치 옵션 (API 스펙에 맞춤)
 const positionOptions = [
-  { value: 'HERO', label: '히어로' },
-  { value: 'SLIDE', label: '슬라이드' },
-  { value: 'HALF', label: '하프' },
-  { value: 'FULL', label: '풀' },
+  { value: 'HERO', label: '히어로', description: '메인 최상단에 노출됩니다. 메인에서는 첫화면에서는 헤더의 폰트가 흰색이라 배경이 어두운 사진이 좋아요.' },
+  { value: 'SLIDE', label: '슬라이드', description: '고정높이 240px의 가로 반응형 배너입니다. 중앙 텍스트 배치가 좋아요.' },
+  { value: 'HALF', label: '하프', description: '*2개를 등록하여 사용하세요! 화면전체의 좌우배치 절반씩 차지하는 배너입니다. 모바일에서는 상하 배치로 변환됩니다. 제목이 텍스트로 노출됩니다.' },
+  { value: 'FULL', label: '풀', description: '화면 전체를 차지하는 풀사이즈 배너에요.' },
 ]
+
+const selectedPositionDescription = computed(() => {
+  const selected = positionOptions.find(opt => opt.value === form.value.position)
+  return selected?.description || ''
+})
 
 // 오늘 날짜+시간 기본값 (YYYY-MM-DDTHH:mm 형식)
 const getDefaultDateTime = () => {
@@ -384,20 +389,24 @@ onMounted(() => {
           <div>
             <label class="block text-sm font-medium text-neutral-700 mb-2">배너 위치</label>
             <div class="flex flex-wrap gap-2">
-              <label
+              <button
                 v-for="opt in positionOptions"
                 :key="opt.value"
+                type="button"
                 :class="[
                   'px-3 py-2 border rounded-lg text-sm cursor-pointer transition-colors',
                   form.position === opt.value
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-neutral-200 hover:border-neutral-300 text-neutral-600',
                 ]"
+                @click="form.position = opt.value"
               >
-                <input v-model="form.position" type="radio" :value="opt.value" class="sr-only">
                 {{ opt.label }}
-              </label>
+              </button>
             </div>
+            <p v-if="selectedPositionDescription" class="mt-2 text-sm text-neutral-500">
+              {{ selectedPositionDescription }}
+            </p>
           </div>
 
           <!-- 노출 순서 -->

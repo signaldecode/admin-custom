@@ -1409,7 +1409,8 @@ onMounted(() => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">상품 태그</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">
+              상품 태그 [BEST 태그는 BEST 탭, 메인 best리스트에 노출, 추천 상품은 메인 MD 추천 리스트에도 노출 됩니다.]</label>
             <div class="flex flex-wrap gap-4">
               <label
                 v-for="tag in tags"
