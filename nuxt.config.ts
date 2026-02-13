@@ -41,6 +41,8 @@ export default defineNuxtConfig({
 
   // 런타임 설정 (환경변수 기반)
   runtimeConfig: {
+    // 서버 전용 (SSR에서 사용) - 환경변수 필수
+    apiBaseUrl: process.env.API_BASE_URL,
     public: {
       // API 요청 경로 (프록시 사용: /api, 직접 호출: 외부 URL)
       // Safari 쿠키 문제 해결을 위해 /api 프록시 권장
