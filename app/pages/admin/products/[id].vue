@@ -414,27 +414,13 @@ const validateForm = () => {
     return false
   }
 
-  if (!product.value.categoryId) {
-    uiStore.showToast({ type: 'error', message: '카테고리를 선택해주세요.' })
-    return false
-  }
-
   if (product.value.price <= 0) {
     uiStore.showToast({ type: 'error', message: '판매가를 입력해주세요.' })
     return false
   }
 
   // 옵션 조합 필수 (재고 관리를 위해)
-  if (!isVariantsGenerated.value || variants.value.length === 0) {
-    uiStore.showToast({ type: 'error', message: '옵션 조합을 생성해주세요. (재고 관리 필수)' })
-    return false
-  }
 
-  const emptySkuVariant = variants.value.find((v) => !v.sku.trim())
-  if (emptySkuVariant) {
-    uiStore.showToast({ type: 'error', message: '모든 옵션 조합에 SKU를 입력해주세요.' })
-    return false
-  }
 
   return true
 }
@@ -870,7 +856,10 @@ onMounted(() => {
         <UiCard>
           <template #header>
             <h3 class="font-semibold text-neutral-900">카테고리</h3>
-            <p class="text-sm text-neutral-500 mt-1">상품이 속할 카테고리를 선택하세요.</p>
+            <p class="text-sm text-neutral-500 mt-1">
+              상품이 속할 카테고리를 선택하세요.<br/>
+              대분류 카테고리로 노출 됩니다. 
+            </p>
           </template>
 
           <div>
@@ -1016,11 +1005,20 @@ onMounted(() => {
           </div>
         </template>
 
-        <div v-if="optionGroups.length === 0" class="text-center py-6">
+        <div v-if="optionGroups.length === 0 && !isVariantsGenerated" class="text-center py-8 space-y-4">
           <p class="text-neutral-500 text-sm">등록된 옵션이 없습니다.</p>
+
+          <!-- 단일 상품 생성 버튼 -->
+          <div class="p-4 bg-primary-50 border border-primary-200 rounded-lg max-w-md mx-auto">
+            <p class="text-sm font-medium text-primary-900 mb-2">옵션이 없는 단일 상품인가요?</p>
+            <p class="text-xs text-primary-600 mb-3">옵션 없이 기본 재고만 관리합니다</p>
+            <UiButton variant="primary" size="sm" @click="createSingleVariant">
+              단일 상품 생성
+            </UiButton>
+          </div>
         </div>
 
-        <div v-else class="space-y-4">
+        <div v-else-if="optionGroups.length > 0" class="space-y-4">
           <div
             v-for="(group, index) in optionGroups"
             :key="group.id"

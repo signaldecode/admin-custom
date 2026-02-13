@@ -25,3 +25,7 @@ logs
 
 # Claude Code
 .claude/
+
+# AWS Amplify
+amplify/
+.amplify/
