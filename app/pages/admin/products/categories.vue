@@ -315,7 +315,7 @@ onMounted(() => {
 <template>
   <LayoutFormPage
     title="카테고리 관리"
-    description="상품 카테고리를 추가하고 관리합니다. 드래그하여 순서를 변경할 수 있습니다."
+    description="상품 카테고리를 추가하고 관리합니다. 드래그하여 순서를 변경할 수 있습니다. 대분류는 상품 목록에 노출 및 메인 hero 영역아래 링크가 생성됩니다."
     :is-saving="isSaving"
     :save-disabled="!hasChanges"
     show-cancel
